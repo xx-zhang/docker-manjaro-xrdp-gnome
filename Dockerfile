@@ -3,7 +3,7 @@ FROM manjarolinux/base:latest
 ARG MIRROR_URL
 
 ENV LANG=en_US.UTF-8
-ENV TZ=America/Los_Angeles
+ENV TZ=Asia/Shanghai
 ENV PATH="/usr/bin:${PATH}"
 ENV PUSER=user
 ENV PUID=1000
@@ -25,10 +25,10 @@ RUN echo "${TZ}" > /etc/timezone && \
   ln -sf "/usr/share/zoneinfo/${TZ}" /etc/localtime
 
 # Populate the mirror list.
-RUN pacman-mirrors --country United_States --api --set-branch stable --protocol https && \
+RUN pacman-mirrors --country China --api --set-branch stable --protocol https && \
   if [[ -n "${MIRROR_URL}" ]]; then \
     mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak && \
-    echo "Server = ${MIRROR_URL}/stable/\$repo/\$arch" > /etc/pacman.d/mirrorlist; \
+    echo "Server = ${MIRROR_URL}/\$repo/\$arch" > /etc/pacman.d/mirrorlist; \
   fi
 
 # Install the keyrings.
@@ -51,6 +51,7 @@ RUN sed -i -e 's~^\(\(CheckSpace\|IgnorePkg\|IgnoreGroup\).*\)$~#\1~' /etc/pacma
   pacman -Syyu --noconfirm --needed && \
   mv -f /etc/pacman.conf.pacnew /etc/pacman.conf && \
   sed -i -e 's~^\(CheckSpace.*\)$~#\1~' /etc/pacman.conf && \
+  sed -i 's/#DisableSandbox/DisableSandbox/g' /etc/pacman.conf && \
   pacman -Scc --noconfirm
 
 # Install the common non-GUI packages.
@@ -100,14 +101,13 @@ RUN pacman -Sy --noconfirm --needed \
   manjaro-aur-support \
   manjaro-base-skel \
   manjaro-browser-settings \
-  manjaro-hotfixes \
   manjaro-pipewire \
   manjaro-zsh-config \
   meson \
   mpdecimal \
   net-tools \
   nfs-utils \
-  nodejs-lts-fermium \
+  nodejs \
   openbsd-netcat \
   openresolv \
   openssh \
@@ -127,8 +127,6 @@ RUN pacman -Sy --noconfirm --needed \
   python-netifaces \
   python-pip \
   python-setuptools \
-  python2 \
-  python2-setuptools \
   rclone \
   ripgrep \
   rsync \
@@ -156,13 +154,18 @@ RUN pacman -Sy --noconfirm --needed \
   zip && \
 pacman -Scc --noconfirm
 
+# ERROR not found in 20250101 
+# pacman -Sy   manjaro-hotfixes --noconfirm
 # Copy the pre-built packages.
-COPY packages/ /packages/
 
-# Install the pre-built packages.
-RUN pacman -U --noconfirm --needed /packages/*/*.tar.* && \
-  rm -fr /packages && \
-  pacman -Scc --noconfirm
+## DELETE python2-env 
+# COPY packages/ /packages/
+
+# # Install the pre-built packages.
+# RUN pacman -U --noconfirm --needed /packages/*/*.tar.* && \
+#   rm -fr /packages && \
+#   pacman -Scc --noconfirm
+## END DELETE python2-env 
 
 # Install ncurses5-compat-libs from AUR.
 RUN \
@@ -253,8 +256,6 @@ RUN pacman -S --noconfirm --needed \
   manjaro-application-utility \
   pamac-gtk \
   poppler-data \
-  qgnomeplatform-qt5 \
-  qgnomeplatform-qt6 \
   seahorse \
   wireshark-qt \
   wmctrl \
@@ -270,6 +271,10 @@ RUN pacman -S --noconfirm --needed \
   xterm \
   zenity && \
 pacman -Scc --noconfirm
+
+# gnome
+# qgnomeplatform-qt5 \
+# qgnomeplatform-qt6 \
 
 # Install the common themes.
 RUN pacman -S --noconfirm --needed \
@@ -299,9 +304,10 @@ pacman -Scc --noconfirm
 # Install xrdp and xorgxrdp from AUR.
 # - Remove the generated XRDP RSA key because it will be generated at the first boot.
 # - Unlock gnome-keyring automatically for xrdp login.
+# ADD cmocka
 RUN \
   pacman -S --noconfirm --needed \
-    check imlib2 tigervnc libxrandr fuse libfdk-aac ffmpeg nasm xorg-server-devel && \
+  cmocka check imlib2 tigervnc libxrandr fuse libfdk-aac ffmpeg nasm xorg-server-devel && \
   cd /tmp && \
   sudo -u builder gpg --recv-keys 61ECEABBF2BB40E3A35DF30A9F72CDBC01BF10EB && \
   sudo -u builder git clone https://aur.archlinux.org/xrdp.git && \
@@ -351,8 +357,6 @@ RUN sed -i -e \
 # Install the desktop environment packages.
 RUN pacman -S --noconfirm --needed \
   baobab \
-  chrome-gnome-shell \
-  disable-tracker \
   eog \
   file-roller \
   gedit \
@@ -362,7 +366,6 @@ RUN pacman -S --noconfirm --needed \
   gnome-layout-switcher \
   gnome-shell-extension-appindicator \
   gnome-shell-extension-dash-to-dock \
-  gnome-shell-extension-no-overview \
   gnome-system-monitor \
   gnome-terminal \
   gnome-tweaks \
@@ -377,6 +380,10 @@ RUN pacman -S --noconfirm --needed \
   terminator \
   xdg-desktop-portal-gnome && \
 pacman -Scc --noconfirm
+
+# chrome-gnome-shell
+# disable-tracker
+# gnome-shell-extension-no-overview \
 
 # Remove the cruft.
 RUN rm -f /etc/locale.conf.pacnew /etc/locale.gen.pacnew
@@ -435,13 +442,6 @@ RUN systemctl enable fix-colord.service
 
 # Delete the 'builder' user from the base image.
 RUN userdel --force --remove builder
-
-# Switch to the default mirrors since we finished downloading packages.
-RUN \
-  if [[ -n "${MIRROR_URL}" ]]; then \
-    mv /etc/pacman.d/mirrorlist.bak /etc/pacman.d/mirrorlist; \
-  fi
-
 # Expose SSH and RDP ports.
 EXPOSE 22
 EXPOSE 3389

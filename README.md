@@ -94,6 +94,26 @@ Use `--no-cache` option:
 docker build --tag 'custom-manjaro-xrdp-gnome:latest' --no-cache .
 ```
 
+
+### 2025.1.1 Update build 
+```bash
+
+docker create \
+  --name gnone \
+  --env "LANG=en_US.UTF-8" \
+  --env "TZ=Asia/Shanghai" \
+  --env "PUSER=user" \
+  --env "PUID=1000" \
+  --tty \
+  --interactive \
+  --privileged \
+  --shm-size 16G \
+  --publish 23389:3389 \
+  --publish 127.0.0.1:8022:22 \
+  piper.tencentcloudcr.com/redau/docker-manjaro-desktop:v20250101
+
+```
+
 ## License
 
 This repository is licensed under [Apache License 2.0](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)).
