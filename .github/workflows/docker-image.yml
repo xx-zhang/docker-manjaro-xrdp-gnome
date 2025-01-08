@@ -3,7 +3,7 @@ name: ci
 on:
   push:
     branch:
-      - * 
+      - github-action 
 
 env:
   DOCKERHUB_REPO: docker-manjaro-desktop-gnome
