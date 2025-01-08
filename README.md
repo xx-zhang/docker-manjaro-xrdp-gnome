@@ -96,6 +96,9 @@ docker build --tag 'custom-manjaro-xrdp-gnome:latest' --no-cache .
 
 
 ### 2025.1.1 Update build 
+- Update build and settings some addtra 修改为中国人方便使用的内容。
+
+
 ```bash
 
 docker create \
@@ -113,6 +116,10 @@ docker create \
   piper.tencentcloudcr.com/redau/docker-manjaro-desktop:v20250101
 
 ```
+
+### 使用内容注意
+> input 里面可以选择 pinyin, 另外布局可以使用中文Keyboard-Chinese； 
+
 
 ## License
 
