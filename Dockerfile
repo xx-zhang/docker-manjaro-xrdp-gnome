@@ -147,6 +147,7 @@ RUN pacman -Sy --noconfirm --needed \
   unrar \
   unzip \
   vim \
+  neovim \
   wireplumber \
   wget \
   xh \
@@ -178,18 +179,18 @@ RUN \
   rm -fr /tmp/ncurses5-compat-libs && \
   pacman -Scc --noconfirm
 
-# Install python38 and python39 from AUR.
-RUN \
-  cd /tmp && \
-  sudo -u builder gpg --recv-keys B26995E310250568 && \
-  sudo -u builder git clone https://aur.archlinux.org/python38.git && \
-  sudo -u builder git clone https://aur.archlinux.org/python39.git && \
-  cd /tmp/python38 && sudo -u builder makepkg --noconfirm && \
-  pacman -U --noconfirm --needed /tmp/python38/*.pkg.tar* && \
-  cd /tmp/python39 && sudo -u builder makepkg --noconfirm && \
-  pacman -U --noconfirm --needed /tmp/python39/*.pkg.tar* && \
-  rm -fr /tmp/python38 /tmp/python39 && \
-  pacman -Scc --noconfirm
+# Install python38 and python39 from AUR. --- remove python3.8 / python3.9 
+# RUN \
+#   cd /tmp && \
+#   sudo -u builder gpg --recv-keys B26995E310250568 && \
+#   sudo -u builder git clone https://aur.archlinux.org/python38.git && \
+#   sudo -u builder git clone https://aur.archlinux.org/python39.git && \
+#   cd /tmp/python38 && sudo -u builder makepkg --noconfirm && \
+#   pacman -U --noconfirm --needed /tmp/python38/*.pkg.tar* && \
+#   cd /tmp/python39 && sudo -u builder makepkg --noconfirm && \
+#   pacman -U --noconfirm --needed /tmp/python39/*.pkg.tar* && \
+#   rm -fr /tmp/python38 /tmp/python39 && \
+#   pacman -Scc --noconfirm
 
 # Install scmpuff from AUR.
 # TODO: Uncomment once scmpuff in AUR is updated.
@@ -201,14 +202,14 @@ RUN \
 #  rm -fr /tmp/scmpuff && \
 #  pacman -Scc --noconfirm
 
-# Install azure-cli-bin from AUR.
-RUN \
-  cd /tmp && \
-  sudo -u builder git clone https://aur.archlinux.org/azure-cli-bin.git && \
-  cd /tmp/azure-cli-bin && sudo -u builder makepkg --noconfirm && \
-  pacman -U --noconfirm --needed /tmp/azure-cli-bin/*.pkg.tar* && \
-  rm -fr /tmp/azure-cli-bin && \
-  pacman -Scc --noconfirm
+# Install azure-cli-bin from AUR. --- remove 
+# RUN \
+#   cd /tmp && \
+#   sudo -u builder git clone https://aur.archlinux.org/azure-cli-bin.git && \
+#   cd /tmp/azure-cli-bin && sudo -u builder makepkg --noconfirm && \
+#   pacman -U --noconfirm --needed /tmp/azure-cli-bin/*.pkg.tar* && \
+#   rm -fr /tmp/azure-cli-bin && \
+#   pacman -Scc --noconfirm
 
 # Install gimme-aws-creds from AUR.
 # TODO: Uncomment once python-ctap-keyring-device is fixed.
