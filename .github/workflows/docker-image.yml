@@ -28,7 +28,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: piper.tencentcloudcr.com
-          username: ${{ vars.TCR_PIPER_ID }}
+          username: 100028485893
           password: ${{ secrets.TCR_PIPER_TOKEN }}
       - 
         name: Generate App Version
